@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#090b10">
+<title>TradePilot — Money Management Dashboard</title>
+<style>
+:root{
+  --bg:#07090d;--panel:#0e1219;--panel2:#121823;--line:#202938;--text:#f5f7fb;
+  --muted:#8d98a9;--accent:#7c5cff;--accent2:#19d3ae;--danger:#ff5570;--warn:#f7b84b;
+  --shadow:0 18px 55px rgba(0,0,0,.34);--radius:22px;
+}
+*{box-sizing:border-box}html,body{margin:0;background:radial-gradient(900px 500px at 85% -10%,rgba(124,92,255,.18),transparent 60%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:1180px;margin:auto;padding:18px 16px 45px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#8d72ff,#4b36c9);display:grid;place-items:center;font-weight:900;box-shadow:0 10px 30px rgba(124,92,255,.3)}
+.brand h1{font-size:18px;margin:0}.brand small{color:var(--muted)}
+.top-actions{display:flex;gap:8px}.icon-btn{width:42px;height:42px;border:1px solid var(--line);background:rgba(14,18,25,.8);color:#fff;border-radius:13px}
+.grid{display:grid;grid-template-columns:1.45fr .85fr;gap:16px}
+.panel{background:linear-gradient(180deg,rgba(18,24,35,.96),rgba(12,16,23,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.hero{position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-120px;background:rgba(124,92,255,.16);filter:blur(20px);border-radius:50%}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:800}
+.balance-row{display:flex;align-items:end;justify-content:space-between;gap:10px;margin-top:7px}.balance{font-size:38px;font-weight:850;letter-spacing:-.04em}.profit{font-size:13px;color:var(--accent2);font-weight:800}
+.progress{height:10px;background:#1a212d;border-radius:99px;overflow:hidden;margin:17px 0 8px}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#a58fff);border-radius:99px;transition:.35s}
+.progress-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.mini{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:17px;padding:13px}.mini span{display:block;color:var(--muted);font-size:11px}.mini b{display:block;margin-top:5px;font-size:18px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}.section-title h2{font-size:15px;margin:0}.section-title span{font-size:11px;color:var(--muted)}
+.controls{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}.field label{display:block;color:var(--muted);font-size:11px;margin:0 0 6px 2px}.field input,.field select{width:100%;border:1px solid var(--line);background:#0a0e14;color:#fff;border-radius:13px;padding:12px 11px;outline:none}.field input:focus,.field select:focus{border-color:#6950d8}
+.primary{width:100%;border:0;color:#fff;background:linear-gradient(135deg,#7c5cff,#4f39cf);padding:13px;border-radius:14px;font-weight:800;margin-top:12px;box-shadow:0 12px 28px rgba(92,67,220,.22)}
+.danger{background:rgba(255,85,112,.1);color:#ff8295;border:1px solid rgba(255,85,112,.25);padding:10px 12px;border-radius:12px;font-weight:750}
+.trade-box{text-align:center;padding:22px 10px}.trade-no{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.13em}.stake{font-size:43px;font-weight:900;letter-spacing:-.04em;margin:5px 0}.sub{color:var(--muted);font-size:12px}.trade-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:17px}.win,.loss{border:0;border-radius:15px;padding:14px;font-weight:850}.win{background:rgba(25,211,174,.12);color:#55e7c8;border:1px solid rgba(25,211,174,.28)}.loss{background:rgba(255,85,112,.1);color:#ff8295;border:1px solid rgba(255,85,112,.25)}
+.table-wrap{overflow:auto;max-height:390px}.table{width:100%;border-collapse:collapse;font-size:12px}.table th{color:var(--muted);font-weight:650;text-align:left;padding:10px;border-bottom:1px solid var(--line)}.table td{padding:10px;border-bottom:1px solid rgba(32,41,56,.65)}.tag{padding:4px 8px;border-radius:8px;font-size:10px;font-weight:800}.tag.win{background:rgba(25,211,174,.1);color:#55e7c8;border:0}.tag.loss{background:rgba(255,85,112,.1);color:#ff8295;border:0}
+.statline{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}.statline span{color:var(--muted)}
+.notice{font-size:11px;line-height:1.5;color:var(--muted);margin-top:12px}.full{grid-column:1/-1}
+.empty{text-align:center;color:var(--muted);padding:30px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.full{grid-column:auto}}
+@media(max-width:430px){.app{padding:12px 11px 35px}.panel{padding:15px;border-radius:19px}.balance{font-size:32px}.cards{gap:8px}.mini b{font-size:16px}.controls{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">TP</div><div><h1>TradePilot</h1><small>Money Management Suite</small></div></div>
+    <div class="top-actions"><button class="icon-btn" id="resetBtn" title="Reset session">↻</button></div>
+  </header>
+
+  <main class="grid">
+    <section class="panel hero">
+      <div class="eyebrow">Portfolio overview</div>
+      <div class="balance-row"><div class="balance" id="balance">₹0</div><div class="profit" id="profit">+₹0</div></div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <div class="progress-meta"><span id="progressText">0% of target</span><span id="targetText">Target ₹0</span></div>
+      <div class="cards">
+        <div class="mini"><span>Starting</span><b id="start">₹0</b></div>
+        <div class="mini"><span>Target</span><b id="target">₹0</b></div>
+        <div class="mini"><span>Trades</span><b id="trades">0 / 0</b></div>
+        <div class="mini"><span>Win rate</span><b id="winrate">0%</b></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title"><h2>Session setup</h2><span>Saved on device</span></div>
+      <div class="controls">
+        <div class="field"><label>Starting capital (₹)</label><input id="capital" type="number" min="1" step="1" value="2000"></div>
+        <div class="field"><label>Target (%)</label><input id="targetPct" type="number" min="0" step=".1" value="30"></div>
+        <div class="field"><label>Total trades</label><input id="totalTrades" type="number" min="1" step="1" value="50"></div>
+        <div class="field"><label>Risk per trade (%)</label><input id="riskPct" type="number" min=".01" max="100" step=".1" value="2"></div>
+        <div class="field"><label>Win payout (%)</label><input id="payout" type="number" min="0" max="1000" step=".1" value="100"></div>
+        <div class="field"><label>Stake mode</label>
+          <select id="stakeMode"><option value="percent">Fixed % of current balance</option><option value="fixed">Fixed ₹ amount</option></select>
+        </div>
+        <div class="field" id="fixedWrap" style="display:none"><label>Fixed stake (₹)</label><input id="fixedStake" type="number" min="0" step=".01" value="40"></div>
+      </div>
+      <button class="primary" id="newBtn">Start / Recalculate Session</button>
+      <div class="notice">This dashboard is a calculator/simulator. It does not place trades or guarantee profit. Use only risk rules you understand.</div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title"><h2>Current trade</h2><span id="status">READY</span></div>
+      <div class="trade-box">
+        <div class="trade-no" id="tradeNo">Trade 01 / 50</div>
+        <div class="stake" id="stake">₹0</div>
+        <div class="sub" id="stakeSub">Suggested risk amount</div>
+        <div class="trade-actions">
+          <button class="win" id="winBtn">✓ WIN</button>
+          <button class="loss" id="lossBtn">✕ LOSS</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title"><h2>Session stats</h2><span>Live</span></div>
+      <div class="statline"><span>Net P/L</span><b id="net">₹0</b></div>
+      <div class="statline"><span>Wins</span><b id="wins">0</b></div>
+      <div class="statline"><span>Losses</span><b id="losses">0</b></div>
+      <div class="statline"><span>Average stake</span><b id="avgStake">₹0</b></div>
+      <div class="statline"><span>Target remaining</span><b id="remaining">₹0</b></div>
+      <div class="statline"><span>Last result</span><b id="last">—</b></div>
+    </section>
+
+    <section class="panel full">
+      <div class="section-title"><h2>Trade history</h2><span id="historyCount">0 records</span></div>
+      <div class="table-wrap">
+        <table class="table"><thead><tr><th>#</th><th>Stake</th><th>Result</th><th>P/L</th><th>Balance</th></tr></thead>
+        <tbody id="history"><tr><td colspan="5" class="empty">No trades yet. Start your session above.</td></tr></tbody></table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number(n)||0);
+let s=null;
+
+function readSetup(){
+  return {
+    capital:Math.max(1,+$('capital').value||0),
+    targetPct:Math.max(0,+$('targetPct').value||0),
+    totalTrades:Math.max(1,Math.floor(+$('totalTrades').value||1)),
+    riskPct:Math.max(.01,+$('riskPct').value||.01),
+    payout:Math.max(0,+$('payout').value||0),
+    mode:$('stakeMode').value,
+    fixedStake:Math.max(0,+$('fixedStake').value||0)
+  };
+}
+function save(){localStorage.setItem('tradepilot_state',JSON.stringify(s));}
+function load(){
+  try{s=JSON.parse(localStorage.getItem('tradepilot_state'))}catch(e){s=null}
+  if(!s) start();
+  else render();
+}
+function start(){
+  const x=readSetup();
+  s={...x,balance:x.capital,trade:0,wins:0,losses:0,totalStaked:0,last:null,history:[]};
+  save();render();
+}
+function currentStake(){
+  if(!s)return 0;
+  const raw=s.mode==='fixed'?s.fixedStake:s.balance*(s.riskPct/100);
+  return Math.max(0,Math.min(raw,Math.max(0,s.balance)));
+}
+function settle(result){
+  if(!s||s.trade>=s.totalTrades)return;
+  const stake=currentStake();
+  if(stake<=0){alert('Available balance is too low for the current stake rule.');return}
+  const pl=result==='WIN'?stake*(s.payout/100):-stake;
+  s.balance=Math.max(0,s.balance+pl);
+  s.trade++;
+  s.totalStaked+=stake;
+  result==='WIN'?s.wins++:s.losses++;
+  s.last=result;
+  s.history.unshift({n:s.trade,stake, result,pl,balance:s.balance});
+  save();render();
+}
+function render(){
+  const target=s.capital*(1+s.targetPct/100), profit=s.balance-s.capital;
+  $('balance').textContent=money(s.balance);$('profit').textContent=(profit>=0?'+':'')+money(profit);
+  $('start').textContent=money(s.capital);$('target').textContent=money(target);
+  $('trades').textContent=`${s.trade} / ${s.totalTrades}`;
+  $('winrate').textContent=s.trade?Math.round(s.wins/s.trade*100)+'%':'0%';
+  const pct=s.capital===target?100:Math.max(0,Math.min(100,(s.balance-s.capital)/(target-s.capital)*100));
+  $('bar').style.width=(isFinite(pct)?pct:0)+'%';
+  $('progressText').textContent=(isFinite(pct)?Math.round(pct):0)+'% of target';
+  $('targetText').textContent='Target '+money(target);
+  $('tradeNo').textContent=s.trade>=s.totalTrades?'Session complete':`Trade ${String(s.trade+1).padStart(2,'0')} / ${s.totalTrades}`;
+  const st=currentStake();$('stake').textContent=money(st);
+  $('stakeSub').textContent=s.mode==='fixed'?'Fixed stake amount':`${s.riskPct}% of current balance`;
+  $('status').textContent=s.trade>=s.totalTrades?'COMPLETE':'READY';
+  $('net').textContent=(profit>=0?'+':'')+money(profit);
+  $('wins').textContent=s.wins;$('losses').textContent=s.losses;
+  $('avgStake').textContent=money(s.trade?s.totalStaked/s.trade:0);
+  $('remaining').textContent=money(Math.max(0,target-s.balance));
+  $('last').textContent=s.last||'—';
+  $('historyCount').textContent=s.history.length+' records';
+  $('winBtn').disabled=s.trade>=s.totalTrades;$('lossBtn').disabled=s.trade>=s.totalTrades;
+  const tbody=$('history');
+  if(!s.history.length){tbody.innerHTML='<tr><td colspan="5" class="empty">No trades yet. Start your session above.</td></tr>'}
+  else tbody.innerHTML=s.history.map(r=>`<tr><td>${r.n}</td><td>${money(r.stake)}</td><td><span class="tag ${r.result.toLowerCase()}">${r.result}</span></td><td style="color:${r.pl>=0?'#55e7c8':'#ff8295'}">${r.pl>=0?'+':''}${money(r.pl)}</td><td>${money(r.balance)}</td></tr>`).join('');
+}
+$('newBtn').onclick=start;
+$('winBtn').onclick=()=>settle('WIN');
+$('lossBtn').onclick=()=>settle('LOSS');
+$('resetBtn').onclick=()=>{if(confirm('Reset the current session?')){localStorage.removeItem('tradepilot_state');start()}};
+$('stakeMode').onchange=()=>{$('fixedWrap').style.display=$('stakeMode').value==='fixed'?'block':'none'};
+load();
+</script>
+</body>
+</html>
